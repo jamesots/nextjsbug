@@ -6,10 +6,19 @@ function DynamicSection({ dataPromise }: { dataPromise: Promise<string> }) {
   return <p>Dynamic: {data}</p>;
 }
 
-export function ClientShell({ dataPromise }: { dataPromise: Promise<string> }) {
+export function ClientShell({
+  content,
+  isDraft,
+  dataPromise,
+}: {
+  content: string;
+  isDraft: boolean;
+  dataPromise: Promise<string>;
+}) {
   return (
     <div>
-      <p>Static content (pre-rendered)</p>
+      <p>Cached content: {content}</p>
+      <p>Draft mode: {isDraft ? 'yes' : 'no'}</p>
       <Suspense fallback={<p>Loading...</p>}>
         <DynamicSection dataPromise={dataPromise} />
       </Suspense>
