@@ -1,14 +1,16 @@
 import { cookies, draftMode } from 'next/headers';
-import { ClientShell } from '../../../components/ClientShell';
+import { setRequestLocale } from 'next-intl/server';
+import { ClientShell } from '../../../../components/ClientShell';
 import { cacheLife, cacheTag } from 'next/cache';
 
 const POSTS = ['hello', 'world', 'foo', 'bar'];
+const LOCALES = ['en', 'de'];
 
-async function getCachedContent(slug: string): Promise<string> {
+async function getCachedContent(slug: string, locale: string): Promise<string> {
   'use cache';
   cacheTag('content');
   cacheLife('max');
-  return `Cached CMS content for: ${slug}`;
+  return `Cached CMS content for: ${slug} (${locale})`;
 }
 
 async function getDynamicData(): Promise<string> {
@@ -17,13 +19,18 @@ async function getDynamicData(): Promise<string> {
 }
 
 export async function generateStaticParams() {
-  return POSTS.map((slug) => ({ slug }));
+  return LOCALES.flatMap((locale) => POSTS.map((slug) => ({ locale, slug })));
 }
 
-export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}) {
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
   const { isEnabled: isDraft } = await draftMode();
-  const content = await getCachedContent(slug);
+  const content = await getCachedContent(slug, locale);
   const dataPromise = getDynamicData();
 
   return <ClientShell content={content} isDraft={isDraft} dataPromise={dataPromise} />;
