@@ -29,10 +29,7 @@ async function getCachedContent(slug: string, locale: string): Promise<string> {
   'use cache';
   cacheTag('content');
   cacheLife('max');
-  // Simulate a large Lexical rich text document
-  return Array.from({ length: 80 }, (_, i) =>
-    `Paragraph ${i} for ${slug} (${locale}): ${'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '.repeat(4)}`
-  ).join('\n\n');
+  return `Cached CMS content for: ${slug} (${locale})`;
 }
 
 async function getDynamicData(): Promise<string> {
