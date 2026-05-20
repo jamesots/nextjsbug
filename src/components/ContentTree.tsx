@@ -1,34 +1,81 @@
-// Server component — each instance is a separate RSC entry, like Lexical nodes
-async function TextNode({ text }: { text: string }) {
-  return <span>{text}</span>;
-}
+import { getTranslations } from 'next-intl/server';
 
-async function ParagraphNode({ index, slug }: { index: number; slug: string }) {
+type Node = {
+  type: 'root' | 'paragraph' | 'heading' | 'text' | 'listitem' | 'list';
+  text?: string;
+  children?: Node[];
+};
+
+// Async server component that calls getTranslations at every node,
+// exactly like LexicalInternal in the original app
+const NodeRenderer = async ({ node, depth }: { node: Node; depth: number }): Promise<React.ReactNode> => {
+  // Mirrors: const t = await getTranslations('lexical') in LexicalInternal
+  const t = await getTranslations();
+
+  if (node.type === 'text') {
+    return <span>{node.text ?? ''}</span>;
+  }
+  if (node.type === 'paragraph') {
+    return (
+      <p>
+        {node.children?.map((child, i) => (
+          <NodeRenderer key={i} node={child} depth={depth + 1} />
+        ))}
+      </p>
+    );
+  }
+  if (node.type === 'heading') {
+    return (
+      <h2>
+        {node.children?.map((child, i) => (
+          <NodeRenderer key={i} node={child} depth={depth + 1} />
+        ))}
+      </h2>
+    );
+  }
+  if (node.type === 'listitem') {
+    return (
+      <li>
+        {node.children?.map((child, i) => (
+          <NodeRenderer key={i} node={child} depth={depth + 1} />
+        ))}
+      </li>
+    );
+  }
+  if (node.type === 'list') {
+    return (
+      <ul>
+        {node.children?.map((child, i) => (
+          <NodeRenderer key={i} node={child} depth={depth + 1} />
+        ))}
+      </ul>
+    );
+  }
+  // root
   return (
-    <p>
-      <TextNode text={`[${index}] ${slug}: `} />
-      <TextNode text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. " />
-      <TextNode text="Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. " />
-      <TextNode text="Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. " />
-    </p>
+    <>
+      {node.children?.map((child, i) => (
+        <NodeRenderer key={i} node={child} depth={depth + 1} />
+      ))}
+    </>
   );
-}
+};
 
-async function HeadingNode({ text }: { text: string }) {
-  return <h2><TextNode text={text} /></h2>;
+function makeDocument(paragraphs: number, slug: string): Node {
+  return {
+    type: 'root',
+    children: Array.from({ length: paragraphs }, (_, i) => ({
+      type: i % 5 === 0 ? 'heading' : 'paragraph' as Node['type'],
+      children: [
+        { type: 'text' as const, text: `[${i}] ${slug}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. ` },
+        { type: 'text' as const, text: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ' },
+        { type: 'text' as const, text: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi.' },
+      ],
+    })),
+  };
 }
 
 export async function ContentTree({ paragraphs, slug }: { paragraphs: number; slug: string }) {
-  const nodes = Array.from({ length: paragraphs }, (_, i) => i);
-  return (
-    <article>
-      {nodes.map((i) => (
-        <section key={i}>
-          <HeadingNode text={`Section ${i}`} />
-          <ParagraphNode index={i} slug={slug} />
-          <ParagraphNode index={i} slug={`${slug}-b`} />
-        </section>
-      ))}
-    </article>
-  );
+  const doc = makeDocument(paragraphs, slug);
+  return <NodeRenderer node={doc} depth={0} />;
 }
