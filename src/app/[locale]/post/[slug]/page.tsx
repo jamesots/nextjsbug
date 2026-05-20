@@ -2,7 +2,7 @@ import { cookies, draftMode } from 'next/headers';
 import { setRequestLocale } from 'next-intl/server';
 import { ClientShell } from '../../../../components/ClientShell';
 import { ContentTree } from '../../../../components/ContentTree';
-import { dataSource } from '../../../../lib/data';
+import { payload } from '../../../../lib/data';
 
 const POSTS = ['hello', 'world', 'foo', 'bar'];
 const LOCALES = ['en', 'de'];
@@ -28,7 +28,7 @@ export default async function Page({
 
   return (
     <ClientShell isDraft={isDraft} dataPromise={dataPromise}>
-      <ContentTree paragraphs={40} slug={`${slug} (${dataSource.name})`} />
+      <ContentTree paragraphs={40} slug={`${slug} (${payload.config.serverURL})`} />
     </ClientShell>
   );
 }

@@ -1,8 +1,4 @@
-// Simulates a module-level await like the original app's:
-//   export const payload = await getPayload({ config: configPromise });
-async function initDataSource() {
-  // Simulate async initialisation (DB connection, etc.)
-  return { name: 'data-source', ready: true };
-}
+import { getPayload } from 'payload';
+import config from '@payload-config';
 
-export const dataSource = await initDataSource();
+export const payload = await getPayload({ config });
