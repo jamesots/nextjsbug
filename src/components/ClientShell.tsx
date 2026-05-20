@@ -19,25 +19,25 @@ export function ClientShell({
 }) {
   return (
     <div>
-      <nav>
+      <p>✅ PAGE RENDERED OK — if you see raw JSON below this or the page repeats, the bug is present.</p>
+      <p>Menu items: {menu.length} sections, {menu.reduce((n, m) => n + m.children.length, 0)} children</p>
+      <p>Content length: {content.length} chars</p>
+      <p>Draft mode: {isDraft ? 'yes' : 'no'}</p>
+      <nav aria-label="menu" style={{ display: 'none' }}>
         <ul>
           {menu.map((item) => (
             <li key={item.id}>
-              <a href={`/${item.slug}`}>{item.title}</a>
+              {item.title}
               <ul>
                 {item.children.map((child) => (
-                  <li key={child.id}><a href={`/${item.slug}/${child.slug}`}>{child.title}</a></li>
+                  <li key={child.id}>{child.title}</li>
                 ))}
               </ul>
             </li>
           ))}
         </ul>
       </nav>
-      <main>
-        <p>Cached content: {content}</p>
-        <p>Draft mode: {isDraft ? 'yes' : 'no'}</p>
-      </main>
-      <Suspense fallback={<p>Loading...</p>}>
+      <Suspense fallback={<p>Loading dynamic section...</p>}>
         <DynamicSection dataPromise={dataPromise} />
       </Suspense>
     </div>
