@@ -29,7 +29,9 @@ async function getCachedContent(slug: string, locale: string): Promise<string> {
   'use cache';
   cacheTag('content');
   cacheLife('max');
-  return `Cached CMS content for: ${slug} (${locale})`;
+  return Array.from({ length: 40 }, (_, i) =>
+    `Paragraph ${i} for ${slug} (${locale}): ${'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '.repeat(4)}`
+  ).join('\n\n');
 }
 
 async function getDynamicData(): Promise<string> {
