@@ -22,5 +22,5 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   const content = await getCachedContent(locale);
   const dataPromise = getDynamicData();
 
-  return <ClientShell content={content} isDraft={isDraft} dataPromise={dataPromise} />;
+  return <ClientShell content={content} isDraft={isDraft} dataPromise={dataPromise} menu={[]} />;
 }
