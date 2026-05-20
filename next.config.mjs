@@ -6,6 +6,9 @@ const withNextIntl = createNextIntlPlugin();
 const nextConfig = {
   cacheComponents: true,
   poweredByHeader: false,
+  experimental: {
+    turbopackServerFastRefresh: false,
+  },
   headers: async () => [
     {
       source: '/:path*',
