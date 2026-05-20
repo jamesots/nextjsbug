@@ -1,14 +1,6 @@
 import { cookies, draftMode } from 'next/headers';
 import { setRequestLocale } from 'next-intl/server';
 import { ClientShell } from '../../components/ClientShell';
-import { cacheLife, cacheTag } from 'next/cache';
-
-async function getCachedContent(locale: string): Promise<string> {
-  'use cache';
-  cacheTag('content');
-  cacheLife('max');
-  return `This is cached CMS content (${locale})`;
-}
 
 async function getDynamicData(): Promise<string> {
   const cookieStore = await cookies();
@@ -19,8 +11,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   const { locale } = await params;
   setRequestLocale(locale);
   const { isEnabled: isDraft } = await draftMode();
-  const content = await getCachedContent(locale);
   const dataPromise = getDynamicData();
 
-  return <ClientShell content={content} isDraft={isDraft} dataPromise={dataPromise} menu={[]} />;
+  return <ClientShell isDraft={isDraft} dataPromise={dataPromise}><p>Home page</p></ClientShell>;
 }
